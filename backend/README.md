@@ -6,6 +6,51 @@
 
 The backend serves as the core API layer for the Rival Secure Blog Platform. It provides RESTful endpoints for authentication, blog management, comments, and user interactions. Built with NestJS, it offers excellent performance, scalability, and type safety with TypeScript.
 
+### Architecture Decisions & Tradeoffs
+
+#### 1. **NestJS Framework Choice**
+- **Rationale**: Enterprise-grade Node.js framework with built-in modular architecture
+- **Benefits**: 
+  - Dependency injection container
+  - Middleware & guard system
+  - Excellent testing utilities
+  - Strong TypeScript support
+- **Tradeoff**: More overhead than lightweight frameworks like Express; not suitable for microservices that need minimal footprint
+
+#### 2. **Prisma ORM**
+- **Rationale**: Type-safe database access with automatically generated client
+- **Benefits**:
+  - Database-agnostic (works with PostgreSQL, MySQL, SQLite, SQL Server)
+  - Built-in migration system
+  - Excellent TypeScript support with auto-generated types
+  - Lazy loading & select optimization
+- **Tradeoff**: Generated client adds build time; complex queries still need raw SQL in some cases
+
+#### 3. **Modular Architecture**
+- **Rationale**: Each feature (auth, blogs, comments) in separate modules
+- **Pattern**: Feature modules contain controller, service, DTO, and entity
+- **Benefit**: Scalable, testable, follows SOLID principles
+- **Tradeoff**: Initial setup overhead for small features
+
+#### 4. **JWT Authentication (Stateless)**
+- **Rationale**: Scalable authentication without server-side session storage
+- **Implementation**: 
+  - Tokens issued on login
+  - JWT payload includes userId and role
+  - Tokens validated on each protected request
+- **Benefits**: Works seamlessly across multiple server instances
+- **Tradeoff**: Token revocation requires additional logic (blacklist or Redis); tokens cannot be invalidated immediately
+
+#### 5. **Global Exception Filter**
+- **Rationale**: Centralized error handling across all routes
+- **Benefits**: Consistent error response format, easier debugging
+- **Implementation**: Custom exception filter handles NestJS exceptions and generic errors
+
+#### 6. **Relationship Design**
+- **One-to-Many**: User → Blogs, Blogs → Comments, User → Comments
+- **Many-to-Many**: User → Likes (through Blog/Comment)
+- **Tradeoff**: Normalized schema (good for consistency, slightly more complex queries); denormalization not used for simplicity
+
 ### Technology Stack
 
 - **Framework**: [NestJS](https://nestjs.com/) - Progressive Node.js Framework
@@ -295,7 +340,115 @@ npm install
 npm run build
 ```
 
-## 📚 Additional Resources
+## � Scaling Strategies
+
+### Database Performance Optimization
+1. **Indexes**: Add indexes on frequently filtered fields
+   ```sql
+   CREATE INDEX idx_blogs_user_id ON blogs(user_id);
+   CREATE INDEX idx_comments_blog_id ON comments(blog_id);
+   CREATE INDEX idx_blogs_created_at ON blogs(created_at DESC);
+   ```
+
+2. **Query Optimization**: 
+   - Use Prisma `select` to fetch only needed fields
+   - Implement pagination with `skip` and `take`
+   - Use cursor-based pagination for better performance on large datasets
+
+3. **Connection Pooling**:
+   ```env
+   # In .env - Prisma handles connection pooling
+   DATABASE_URL="postgresql://user:password@host/db?connectionLimit=5"
+   ```
+
+### Caching Layer (Redis)
+```typescript
+// Example: Cache frequently accessed blogs
+import * as redis from 'redis';
+
+const client = redis.createClient();
+
+// Get with cache
+async getBlog(id: string) {
+  const cached = await client.get(`blog:${id}`);
+  if (cached) return JSON.parse(cached);
+  
+  const blog = await prisma.blog.findUnique({ where: { id } });
+  await client.setEX(`blog:${id}`, 3600, JSON.stringify(blog)); // 1 hour TTL
+  return blog;
+}
+```
+
+### Horizontal Scaling
+1. **Load Balancing**: 
+   - Deploy multiple NestJS instances
+   - Use Nginx, HAProxy, or cloud load balancers (AWS ALB, GCP LB)
+   
+2. **Health Checks**:
+   ```typescript
+   // Add health check endpoint
+   @Get('/health')
+   health() {
+     return { status: 'ok', timestamp: new Date() };
+   }
+   ```
+
+3. **Graceful Shutdown**:
+   ```typescript
+   // NestJS automatically handles SIGTERM signal
+   // Requires: npm install @nestjs/graceful-shutdown
+   ```
+
+### Rate Limiting & Throttling
+```typescript
+// Apply globally in main.ts using throttle guard
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
+@UseGuards(ThrottlerGuard)
+@Controller('blogs')
+export class BlogsController { }
+```
+
+### Async Processing
+```typescript
+// Use Bull for background jobs
+import { Queue } from 'bull';
+
+@Processor('notifications')
+export class NotificationProcessor {
+  @Process()
+  async sendNotification(job: Job) {
+    // Process email/notifications asynchronously
+  }
+}
+```
+
+### Monitoring & Observability
+```typescript
+// Add Prometheus metrics
+npm install @nestjs/prometheus
+npm install prom-client
+
+// Monitor:
+- Request duration (p50, p95, p99)
+- Database query time
+- Active connections
+- Error rates
+```
+
+### Database Replication
+- Use **Read Replicas** for analytics and read-heavy queries
+- Keep writes on primary database
+- Prisma can be configured to use replicas for specific queries
+
+### Future Microservices Architecture
+When scaling to millions of users:
+1. Split modules into separate services (Auth Service, Blog Service, Notification Service)
+2. Use API Gateway for routing
+3. Implement inter-service communication with gRPC or message queues
+4. Use event-driven architecture with Kafka/RabbitMQ
+
+## �📚 Additional Resources
 
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [Prisma Documentation](https://www.prisma.io/docs/)

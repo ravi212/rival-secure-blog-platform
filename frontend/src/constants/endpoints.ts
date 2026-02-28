@@ -10,6 +10,11 @@ export const ENDPOINTS = {
     CREATE: "/blogs",
     UPDATE: (id: string) => `/blogs/${id}`,
     DELETE: (id: string) => `/blogs/${id}`,
+    MY: "/blogs/my-posts/all",
+  },
+  PUBLIC: {
+    FEED: "/public/feed",
+    BLOG_BY_SLUG: (slug: string) => `/public/blogs/${slug}`,
   },
 
   COMMENT: {

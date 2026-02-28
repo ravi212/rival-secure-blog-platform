@@ -97,4 +97,66 @@ export class BlogsService {
 
     return !!existing;
   }
+
+  async getMyBlogs(userId: string, params: { page: number; limit: number }) {
+    const { page, limit } = params;
+
+    const safeLimit = Math.min(limit, 20);
+    const skip = (page - 1) * safeLimit;
+
+    const where = {
+      userId,
+    };
+
+    const [blogs, total] = await this.prisma.$transaction([
+      this.prisma.blog.findMany({
+        where,
+        skip,
+        take: safeLimit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          isPublished: true,
+          createdAt: true,
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
+          },
+        },
+      }),
+      this.prisma.blog.count({ where }),
+    ]);
+
+    return {
+      data: blogs,
+      meta: {
+        total,
+        page,
+        limit: safeLimit,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
+  }
+
+  async getBlogById(userId: string, blogId: string) {
+    const blog = await this.prisma.blog.findUnique({
+      where: { id: blogId },
+    });
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (blog.userId !== userId) {
+      throw new ForbiddenException('You are not allowed to view this blog');
+    }
+
+    return blog;
+  }
 }

@@ -1,11 +1,10 @@
-import { QUERY_KEYS } from '@/constants/query-keys';
-import { blogService } from '@/services/blog.service';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
+import { feedService } from "@/services/feed.service";
 
-export function useFeed() {
+export const useFeed = (page: number) => {
   return useQuery({
-    queryKey: QUERY_KEYS.blogs.all,
-    queryFn: blogService.getAll,
-    staleTime: 1000 * 60, // 1 min
+    queryKey: ["feed", page],
+    queryFn: () => feedService.getFeed(page, 10),
+    // keepPreviousData: true,
   });
-}
+};

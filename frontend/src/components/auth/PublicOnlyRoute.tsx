@@ -15,7 +15,7 @@ export default function PublicOnlyRoute({
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/dashboard");
+      router.replace("/my-space");
     }
   }, [isAuthenticated, router]);
 

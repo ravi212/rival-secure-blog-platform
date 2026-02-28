@@ -12,4 +12,7 @@ export const apiClient = {
 
   delete: <T>(url: string, config = {}) =>
     axiosInstance.delete<T>(url, config).then(res => res.data),
+
+  patch: <T>(url: string, data?: unknown, config = {}) =>
+    axiosInstance.patch<T>(url, data, config).then(res => res.data),
 };

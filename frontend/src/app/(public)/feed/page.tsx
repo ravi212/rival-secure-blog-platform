@@ -1,3 +1,4 @@
+"use client";
 import BlogList from "@/components/blog/BlogList";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";

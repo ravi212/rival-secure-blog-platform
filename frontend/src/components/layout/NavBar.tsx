@@ -15,9 +15,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "../ui/Button";
+import { useAuthContext } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function Navbar() {
-  const isAuthenticated = false; // wire later
+  const {isAuthenticated, logout} = useAuthContext(); 
 
   return (
     <header className="border-b bg-white/80 backdrop-blur sticky top-0 z-50">
@@ -52,16 +54,16 @@ export default function Navbar() {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger>
-                {/* <Avatar>
+                <Avatar>
                   <AvatarImage src="/avatar.png" />
                   <AvatarFallback>RR</AvatarFallback>
-                </Avatar> */}
+                </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}

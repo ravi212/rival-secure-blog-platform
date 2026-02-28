@@ -24,7 +24,7 @@ export class AuthService {
 
     const user = await this.usersService.createUser(email, passwordHash);
 
-    return this.generateToken(user.id, user.email);
+    return {message: 'Registration successful', user: {userId: user.id, email: user.email}};
   }
 
   async login(email: string, password: string) {
@@ -38,12 +38,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateToken(user.id, user.email);
+    return {message: 'Login successful', user: {userId: user.id, email: user.email}, ...this.generateToken(user.id, user.email)};
   }
 
   private generateToken(userId: string, email: string) {
     const payload = { sub: userId, email };
-    const accessToken = this.jwtService.sign(payload);
-    return { accessToken };
+    const token = this.jwtService.sign(payload);
+    return { token };
   }
 }

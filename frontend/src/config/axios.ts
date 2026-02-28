@@ -1,40 +1,29 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: false,
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  return config;
+});
 
-axiosInstance.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      'Something went wrong';
-
-    return Promise.reject(new Error(message));
+    if (error.response?.status === 401) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+export default apiClient;

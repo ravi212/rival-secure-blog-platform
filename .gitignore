@@ -3,11 +3,16 @@ frontend/dist
 frontend/node_modules
 frontend/.next
 frontend/.env
+backend/.vscode
 
 # Backend
 backend/dist
 backend/node_modules
 backend/.env
+backend/generated
+backend/.vscode
 
+
+.vscode
 
 

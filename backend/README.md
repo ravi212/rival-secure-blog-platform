@@ -1,53 +1,323 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Rival Secure Blog Platform - Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> REST API backend for the Rival Secure Blog Platform built with NestJS and Prisma
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Overview
 
-## Description
+The backend serves as the core API layer for the Rival Secure Blog Platform. It provides RESTful endpoints for authentication, blog management, comments, and user interactions. Built with NestJS, it offers excellent performance, scalability, and type safety with TypeScript.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Technology Stack
 
-## Project setup
+- **Framework**: [NestJS](https://nestjs.com/) - Progressive Node.js Framework
+- **Language**: TypeScript
+- **Database**: PostgreSQL with [Prisma](https://www.prisma.io/) ORM
+- **Authentication**: JWT (JSON Web Tokens)
+- **Validation**: Class Validator & Class Transformer
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- PostgreSQL 12+
+
+### Installation
 
 ```bash
-$ yarn install
+# Install dependencies
+npm install
+# or
+yarn install
+
+# Setup environment variables (see Configuration section)
+cp .env.example .env
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start development server
+npm run start:dev
 ```
 
-## Compile and run the project
+The API will be available at `http://localhost:3001`
+
+## 📋 Project Setup
+
+### Install Dependencies
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+npm install
 ```
 
-## Run tests
+### Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/blog_platform
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here_change_in_production
+JWT_EXPIRATION=7d
+
+# CORS (for frontend development)
+FRONTEND_URL=http://localhost:3000
+```
+
+## 🏃 Running the Application
+
+### Development Mode
 
 ```bash
-# unit tests
+# Start with hot reload
+npm run start:dev
+```
+
+### Production Mode
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm run start:prod
+```
+
+### Watch Mode
+
+```bash
+npm run start:watch
+```
+
+## 🧪 Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run e2e tests
+npm run test:e2e
+
+# Generate test coverage report
+npm run test:cov
+```
+
+## 🗄️ Database
+
+### Migrations
+
+```bash
+# Create a new migration
+npx prisma migrate dev --name migration_name
+
+# Apply pending migrations
+npx prisma migrate deploy
+
+# Reset database (CAUTION: Deletes all data)
+npx prisma migrate reset
+
+# View migration history
+npx prisma migrate status
+```
+
+### Prisma Studio
+
+Open interactive database browser:
+
+```bash
+npx prisma studio
+```
+
+## 📚 API Endpoints
+
+### Authentication Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | User login |
+| GET | `/auth/profile` | Get current user profile |
+| PUT | `/auth/profile` | Update user profile |
+
+### Blog Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/blogs` | Get all blogs (paginated) |
+| POST | `/blogs` | Create new blog |
+| GET | `/blogs/:id` | Get blog details |
+| PUT | `/blogs/:id` | Update blog |
+| DELETE | `/blogs/:id` | Delete blog |
+| GET | `/blogs/user/:userId` | Get user's blogs |
+
+### Comment Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/comments` | Add comment |
+| GET | `/comments/blog/:blogId` | Get blog comments |
+| PUT | `/comments/:id` | Update comment |
+| DELETE | `/comments/:id` | Delete comment |
+
+### Like Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/likes` | Add like |
+| DELETE | `/likes/:id` | Remove like |
+| GET | `/likes/blog/:blogId/count` | Get blog like count |
+
+## 📁 Project Structure
+
+```
+backend/
+├── src/
+│   ├── main.ts                 # Application entry point
+│   ├── app.module.ts           # Root module
+│   ├── app.controller.ts       # Root controller
+│   ├── app.service.ts          # Root service
+│   ├── common/                 # Shared utilities
+│   │   ├── constants/          # Application constants
+│   │   ├── filters/            # Global exception filters
+│   │   ├── guards/             # Auth guards
+│   │   └── utils/              # Utility functions
+│   ├── config/                 # Configuration
+│   ├── database/               # Database layer
+│   │   └── prisma/             # Prisma service & module
+│   ├── modules/                # Feature modules
+│   │   ├── auth/               # Authentication
+│   │   ├── blogs/              # Blog management
+│   │   ├── comments/           # Comments system
+│   │   ├── likes/              # Likes feature
+│   │   ├── users/              # User management
+│   │   └── public/             # Public routes
+│   └── strategies/             # Authentication strategies
+├── prisma/
+│   ├── schema.prisma           # Database schema
+│   └── migrations/             # Database migrations
+├── test/                       # E2E tests
+└── package.json
+```
+
+## 🔐 Authentication
+
+The API uses JWT-based authentication:
+
+1. User registers or logs in
+2. Server returns JWT token
+3. Client includes token in `Authorization: Bearer <token>` header
+4. JWT Guard validates token on protected routes
+
+### Protected Routes
+
+All routes except `/auth/register` and `/auth/login` require valid JWT token.
+
+## 🎯 Module Organization
+
+Each feature module follows NestJS best practices:
+
+```
+module/
+├── controllers/          # HTTP request handlers
+├── services/            # Business logic
+├── dto/                 # Data transfer objects
+├── entities/            # Database models (generated)
+├── module.ts            # Module definition
+└── *.spec.ts           # Tests
+```
+
+## 🛠️ Development Guidelines
+
+### Code Style
+
+- Follow TypeScript strict mode
+- Use ESLint configuration provided
+- Use Prettier for code formatting
+
+### Naming Conventions
+
+- **Controllers**: `*.controller.ts`
+- **Services**: `*.service.ts`
+- **DTOs**: `*.dto.ts`
+- **Modules**: `*.module.ts`
+
+### Error Handling
+
+Global exception filter automatically handles errors and returns standardized error responses.
+
+## 📋 Environment Configuration
+
+Refer to `.env.example` for all available configuration options.
+
+### Key Variables
+
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - Secret key for JWT signing
+- `JWT_EXPIRATION` - Token expiration time
+- `PORT` - Server port
+- `NODE_ENV` - Environment (development, staging, production)
+
+## 🚨 Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Verify connection string
+# Check PostgreSQL is running
+# Reset migrations
+npx prisma migrate reset
+```
+
+### Port Already in Use
+
+```bash
+# Change PORT in .env or kill process using the port
+# On Windows
+netstat -ano | findstr :3001
+taskkill /PID <PID> /F
+```
+
+### Build Errors
+
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+## 📚 Additional Resources
+
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [Prisma Documentation](https://www.prisma.io/docs/)
+- [JWT Guide](https://en.wikipedia.org/wiki/JSON_Web_Token)
+
+## 🤝 Contributing
+
+When contributing to the backend:
+
+1. Follow the established project structure
+2. Write tests for new features
+3. Ensure all tests pass
+4. Follow code style guidelines
+5. Create descriptive pull requests
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Built with ❤️ using NestJS**
 $ yarn run test
 
 # e2e tests

@@ -21,7 +21,7 @@ async function bootstrap() {
   // app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.enableCors({
-    origin: 'http://localhost:3001',
+    origin: process.env.FRONTEND_URL,
   });
 
   ConfigModule.forRoot({
